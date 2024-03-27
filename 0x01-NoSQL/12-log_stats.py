@@ -19,6 +19,6 @@ if __name__ == '__main__':
         'DELETE': nginx.count_documents({'method': 'DELETE'})
     }
     for method, count in methods.items():
-        print(f'    method {method}: {count}')
+        print(f'\tmethod {method}: {count}')
 
     print(f"{nginx.count_documents({'path': '/status'})} status check")
