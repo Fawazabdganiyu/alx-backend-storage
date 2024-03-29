@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 """ Definition of Cache module """
+from functools import wraps
 import redis
 import uuid
 from typing import Union, Callable, Optional
+
+
+def count_calls(method: Callable) -> Callable:
+    """ Count the number of times a method has been called """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """ Count before returning the called method """
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 class Cache:
@@ -13,6 +25,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """ Store """
         key = str(uuid.uuid4())
