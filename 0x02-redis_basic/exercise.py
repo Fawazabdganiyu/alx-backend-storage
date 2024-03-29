@@ -35,6 +35,21 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def replay(fn: Callable) -> None:
+    """ Display the history of a function calls """
+    in_key = fn.__qualname__ + ":inputs"
+    out_key = fn.__qualname__ + ":outputs"
+
+    inputs = fn.__self__._redis.lrange(in_key, 0, -1)
+    outputs = fn.__self__._redis.lrange(out_key, 0, -1)
+
+    print(f"{fn.__qualname__} was called {len(inputs)} times:")
+    for in_data, out_data in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(fn.__qualname__,
+                                     in_data.decode("utf-8"),
+                                     out_data.decode('utf-8')))
+
+
 class Cache:
     """ Definition of Cache class """
 
